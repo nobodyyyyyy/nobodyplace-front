@@ -32,6 +32,8 @@ export default {
   },
   methods: {
     login () {
+      const _this = this;
+      console.log(this.$store.state)
       this.$axios
           .post('/login', {
             username: this.loginForm.username,
@@ -39,7 +41,9 @@ export default {
           })
           .then(successResponse => {
             if (successResponse.data.code === 200) {
-              this.$router.replace({path: '/index'})
+              _this.$store.commit('login', _this.loginForm)
+              const path = this.$route.query.redirect;
+              this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
             } else if (successResponse.data.code === 400) {
               this.$message({
                 message: '密码输错',
@@ -47,8 +51,8 @@ export default {
               });
             }
           })
-          .catch(() => {
-            // do nothing
+          // eslint-disable-next-line no-unused-vars
+          .catch(failResponse => {
           })
     }
   }
@@ -58,7 +62,7 @@ export default {
 <style>
 
 #poster {
-  background: url("../assets/background.jpg") no-repeat center;
+  background: url("../../public/backgrounds/default_background_1.jpg") no-repeat center;
   height: 100%;
   width: 100%;
   background-size: cover;
