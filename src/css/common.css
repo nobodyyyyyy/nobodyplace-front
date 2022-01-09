@@ -1,0 +1,21 @@
+input::-webkit-search-cancel-button {
+  display: none;
+}
+
+input[type=search]::-ms-clear{
+  display: none;
+}
+/*
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+  color: #666
+}
+input:-moz-placeholder, textarea:-moz-placeholder {
+  color:#666
+}
+input::-moz-placeholder, textarea::-moz-placeholder {
+  color:#666;
+}
+input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+  color:#666
+}
+*/
