@@ -19,22 +19,23 @@
         <input id="searchInput" type="search" autocomplete="off"
                spellcheck="false" role="combobox"
                aria-live="polite" placeholder="在 Google 上搜索，或者输入一个网址"
-               v-model="search_box_input"
-               @keyup.enter="submit"
+               v-model="search_box_input" @keyup.enter="submit"
                v-on:focusin="onFocus = true"
                v-on:focusout="onFocus = false"
-               v-on:input="getSuggestions">
+               v-on:input="getSuggestions"
+               @compositionstart="input_lock = true"
+               @compositionend="input_lock = false">
 
         <img id="searchIcon" src="../../public/icons/search_icon.png" alt="search"/>
       </div>
 
 <!--      <div id="suggestionsWrapper" v-if="onFocus">-->
       <div id="suggestionsWrapper">
-        <div v-for="(suggestion, index) in suggestions"
-             :key="index"
-             @click="openSuggestionSite(index)">
-          {{suggestion}}
-        </div>
+          <div v-for="(suggestion, index) in suggestions"
+               :key="index"
+               @click="openSuggestionSite(index)">
+            {{suggestion}}
+          </div>
       </div>
     </div>
   </div>
@@ -50,6 +51,7 @@ export default {
   data() {
     return {
       search_box_input: '',
+      input_lock: false,
       onFocus: false,
       web_prefix: 'https://www.google.com/search?q=',
       time: {
@@ -64,6 +66,11 @@ export default {
   },
   methods: {
     getSuggestions() {
+      if (this.input_lock) {
+        // 正在用输入法，别理会……
+        return;
+      }
+
       const _this = this;
       _this.suggestions = [];
       if (_this.search_box_input === '') {
@@ -76,7 +83,7 @@ export default {
             params: {
               input: this.search_box_input
             },
-            timeout: 500,
+            timeout: 1000,
           })
           .then(resp => {
             if (resp.data.code === 200 && resp.data.data.input === _this.search_box_input) {
@@ -94,7 +101,6 @@ export default {
     },
     openSuggestionSite(index) {
       let suggestion = this.suggestions[index]
-      console.log(suggestion + "clicked >>>>>>")
       window.open(this.web_prefix + suggestion,'_blank')
     },
     getTimesInterval() {
@@ -137,6 +143,7 @@ export default {
   z-index: -100;
   object-fit: cover;
   transition: opacity 1s, transform .25s, filter .25s;
+  -webkit-transition: opacity 1s, transform .25s, filter .25s;
   backface-visibility: hidden;
   display: block;
 }
@@ -159,6 +166,7 @@ export default {
   width: 100%;
   height: 100%;
   transition: .25s;
+  -webkit-transition: .25s;
   background-image: radial-gradient(rgba(220, 220, 220, 0.1), rgba(239, 182, 189, 0.3));
 }
 
@@ -177,14 +185,15 @@ export default {
   font-weight: inherit;
   text-shadow: 0 0 20px rgb(0 0 0 / 35%);
   transition: .25s;
+  -webkit-transition: .25s;
   line-height: 20px;
   animation-delay: 0s;
   margin-top: 180px;
   user-select: none;
 
-  transform: rotateX(360deg);
-  -webkit-transform: rotateX(360deg); /* Safari 与 Chrome */
-  transition-duration: 0.25s;
+  /*transform: rotateX(360deg);*/
+  /*-webkit-transform: rotateX(360deg); !* Safari 与 Chrome *!*/
+  /*transition-duration: 0.25s;*/
 }
 
 #inputWrapper {
@@ -206,6 +215,7 @@ export default {
   position: relative;
 
   transition: .25s;
+  -webkit-transition: .25s;
 }
 
 #searchInput:hover {
@@ -239,6 +249,7 @@ export default {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: .25s;
+  -webkit-transition: .25s;
 }
 
 #suggestionsWrapper div {
@@ -257,13 +268,21 @@ export default {
 
   color: rgba(51, 41, 41, 0.8);
   transition: .25s;
-  transition-property: text-indent;
+  /*transition-property: text-indent;*/
 }
 
 #suggestionsWrapper div:hover {
   text-indent: 30px;
   border-radius: 20px;
   background: rgba(245, 241, 241, 0.7);
+}
+
+/*搜索建议显示动画*/
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 </style>
