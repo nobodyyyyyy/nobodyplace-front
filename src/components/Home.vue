@@ -28,11 +28,13 @@
         <img id="searchIcon" src="../../public/icons/search_icon.png" alt="search"/>
       </div>
 
-      <div id="suggestionsWrapper" v-if="onFocus">
-        <div>暗杀1</div>
-        <div>暗杀的故事</div>
-        <div>暗杀啊啊啊啊啊</div>
-        <div>一个电影</div>
+<!--      <div id="suggestionsWrapper" v-if="onFocus">-->
+      <div id="suggestionsWrapper">
+        <div v-for="(suggestion, index) in suggestions"
+             :key="index"
+             @click="openSuggestionSite(index)">
+          {{suggestion}}
+        </div>
       </div>
     </div>
   </div>
@@ -63,18 +65,37 @@ export default {
   methods: {
     getSuggestions() {
       const _this = this;
+      _this.suggestions = [];
+      if (_this.search_box_input === '') {
+        return;
+      }
+
+      console.log("sending request for input: ", _this.search_box_input)
       this.$axios
-          .get("/web_search")
-          .then(successResponse => {
-            _this.suggestions = successResponse.data;
-            console.log(successResponse.data)
+          .get("/get_search_suggestions", {
+            params: {
+              input: this.search_box_input
+            },
+            timeout: 500,
+          })
+          .then(resp => {
+            if (resp.data.code === 200 && resp.data.data.input === _this.search_box_input) {
+              _this.suggestions = resp.data.data.suggestions;
+            }
+            console.log('search suggestions are: ', _this.suggestions)
           })
           // eslint-disable-next-line no-unused-vars
-          .catch(failResponse => {
+          .catch(failResp => {
+            console.log(failResp)
           })
     },
     submit() {
       window.open(this.web_prefix + this.search_box_input,'_blank')
+    },
+    openSuggestionSite(index) {
+      let suggestion = this.suggestions[index]
+      console.log(suggestion + "clicked >>>>>>")
+      window.open(this.web_prefix + suggestion,'_blank')
     },
     getTimesInterval() {
       let _this = this;

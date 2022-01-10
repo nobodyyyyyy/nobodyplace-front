@@ -39,12 +39,12 @@ export default {
             username: this.loginForm.username,
             password: this.loginForm.password
           })
-          .then(successResponse => {
-            if (successResponse.data.code === 200) {
+          .then(resp => {
+            if (resp.data.code === 200) {
               _this.$store.commit('login', _this.loginForm)
               const path = this.$route.query.redirect;
               this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
-            } else if (successResponse.data.code === 400) {
+            } else if (resp.data.code === 400) {
               this.$message({
                 message: '密码输错',
                 type: 'warning'
@@ -84,7 +84,7 @@ body{
 }
 
 .login_title {
-  margin: 0px auto 40px auto;
+  margin: 0 auto 40px auto;
   text-align: center;
   color: #505458;
 }
