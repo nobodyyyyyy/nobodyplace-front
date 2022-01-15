@@ -4,11 +4,13 @@
 
         <!--    TODO src 放后端 -->
         <video id="background" autoplay loop muted :class="{'onFocus': onFocus}">
-            <source src="../../public/backgrounds/background_seaside.mp4" type="video/mp4"  />
+            <source src="../../public/backgrounds/background_mountain.mp4" type="video/mp4"  />
         </video>
 
+        <entry-box></entry-box>
+
         <!--    防止组件拖动-->
-        <div class="cover" id="cover" style="opacity: 1;"></div>
+        <div class="cover" id="cover" style=""></div>
         <div id="content">
             <h1 id="clock">
                 {{time.month}}月{{time.day}}日
@@ -18,7 +20,7 @@
             <div id="inputWrapper">
                 <input id="searchInput" type="search" autocomplete="off"
                        spellcheck="false" role="combobox"
-                       aria-live="polite" placeholder="在 Google 上搜索，或者输入一个网址"
+                       aria-live="polite" placeholder="输入关键词查询，或者输入一个网址"
                        v-model="userInput" @keyup.enter="submit"
                        v-on:focusin="onFocus = true"
                        v-on:focusout="onFocus = false"
@@ -50,12 +52,25 @@
 </template>
 
 <script>
+import EntryBox from "@/components/homeEntries/EntryBox";
+
 const KEYCODE_ARROW_UP = 38;
 const KEYCODE_ARROW_DOWN = 40;
 const WEB_URL_PREFIXES = ['https://', 'http://'];
 
+const SUGGESTION_ENGINE_BING = 'suggestion_engine_bing';
+const SUGGESTION_ENGINE_GOOGLE = 'suggestion_engine_google';
+const SUGGESTION_ENGINE_BAIDU = 'suggestion_engine_baidu';
+
+const SEARCH_ENGINE_BING = 'search_engine_bing';
+const SEARCH_ENGINE_GOOGLE = 'search_engine_google';
+const SEARCH_ENGINE_BAIDU = 'search_engine_baidu';
+
 export default {
     name: "Home",
+    components: {
+        EntryBox,
+    },
     created() {
         this.getCurrentTime()
         setInterval(this.getCurrentTime, 1000);
@@ -105,6 +120,9 @@ export default {
             this.$axios
                 .get("/get_search_suggestions", {
                     params: {
+                        // engine: SUGGESTION_ENGINE_BING,
+                        engine: that.$store.state.suggestionEngine,
+                        // engine: SUGGESTION_ENGINE_BAIDU,
                         seq: that.seq,
                         input: this.userInput
                     },
@@ -113,9 +131,11 @@ export default {
                 .then(resp => {
                     if (resp.data.code === 200 && resp.data.data.seq === that.seq) {
                         that.suggestions = resp.data.data.suggestions;
+                        that.suggestionCurSelectIdx = -1;
+                        console.log('search suggestions are: ', that.suggestions)
+                    } else {
+                        console.log('resp code unexpected or resp seq didn\'t match')
                     }
-                    that.suggestionCurSelectIdx = -1;
-                    console.log('search suggestions are: ', that.suggestions)
                 })
                 // eslint-disable-next-line no-unused-vars
                 .catch(failResp => {
@@ -127,14 +147,28 @@ export default {
          * 回车查询
          */
         submit() {
+            if (this.inputLock) {
+                return;
+            }
             for (let i = 0; i < WEB_URL_PREFIXES.length; ++i) {
                 if (this.userInput.startsWith(WEB_URL_PREFIXES[i])) {
                     location.href = this.userInput;
                     return;
                 }
             }
-            location.href = this.webPrefix + this.userInput
+            let engine = this.$store.state.searchEngine;
+            location.href = this.getEnginePrefix(engine) + this.userInput
             // window.open(this.webPrefix + this.userInput,'_blank')  // 新窗口打开
+        },
+
+        getEnginePrefix(engine) {
+            if (engine === SEARCH_ENGINE_GOOGLE) {
+                return 'https://www.google.com/search?q=';
+            } else if (engine === SEARCH_ENGINE_BAIDU) {
+                return 'https://www.baidu.com/s?ie=utf-8&word=';
+            } else if (engine === SEARCH_ENGINE_BING) {
+                return 'https://cn.bing.com/search?q=';
+            }
         },
 
         /**
@@ -164,23 +198,28 @@ export default {
                 return;
             }
             let keyCode = e.keyCode
-            if (keyCode === KEYCODE_ARROW_DOWN) {
-                curSelectIdx = (lastSelectIdx + 1) % suggestionsLength;
-            } else if (keyCode === KEYCODE_ARROW_UP) {
-                curSelectIdx = (lastSelectIdx === 0) ? suggestionsLength - 1 : lastSelectIdx - 1;
-            } else {
-                return;
-            }
-            // update
-            that.suggestionCurSelectIdx = curSelectIdx;
 
-            // 样式更变、输入框内容变化
-            that.$refs[`suggestion_${curSelectIdx}`][0].style = 'text-indent: 30px;' +
-                'border-radius: 20px; background: rgba(245, 241, 241, 0.7);';
-            if (lastSelectIdx >= 0)  {
-                this.$refs[`suggestion_${lastSelectIdx}`][0].style = ''
+            // 搜索建议选择
+            if (keyCode === KEYCODE_ARROW_DOWN || keyCode === KEYCODE_ARROW_UP) {
+                if (keyCode === KEYCODE_ARROW_DOWN) {
+                    curSelectIdx = (lastSelectIdx + 1) % suggestionsLength;
+                } else {
+                    curSelectIdx = (lastSelectIdx === 0) ? suggestionsLength - 1 : lastSelectIdx - 1;
+                }
+                // update
+                that.suggestionCurSelectIdx = curSelectIdx;
+
+                // 样式更变、输入框内容变化
+                that.$refs[`suggestion_${curSelectIdx}`][0].style = 'text-indent: 30px;' +
+                    'border-radius: 20px; background: rgba(245, 241, 241, 0.7);';
+                if (lastSelectIdx >= 0)  {
+                    this.$refs[`suggestion_${lastSelectIdx}`][0].style = ''
+                }
+                that.userInput = that.suggestions[curSelectIdx]
+            } else {
+                // TODO enter 输入法问题
+                // tbd
             }
-            that.userInput = that.suggestions[curSelectIdx]
         },
 
         getCurrentTime() {
@@ -205,13 +244,19 @@ export default {
             _this.time.hour = hours;
             _this.time.minute = minutes;
             _this.time.second = seconds;
-        }
+        },
     }
 }
 </script>
 
 <style>
 @import '../css/common.css';
+
+html,body {
+    margin:0;
+    padding:0;
+    overflow: hidden;
+}
 
 #background {
     background: no-repeat center;
@@ -257,7 +302,7 @@ footer {
     height: 100%;
     transition: .25s;
     -webkit-transition: .25s;
-    background-image: radial-gradient(rgba(220, 220, 220, 0.1), rgba(239, 182, 189, 0.3));
+    /*background-image: radial-gradient(rgba(220, 220, 220, 0.1), rgba(239, 182, 189, 0.3));*/
 }
 
 #content {
@@ -272,6 +317,7 @@ footer {
 #clock {
     color: #fff;
     font-size: 36px;
+    text-align: center;
     font-weight: inherit;
     text-shadow: 0 0 20px rgb(0 0 0 / 35%);
     transition: .25s;
@@ -280,10 +326,6 @@ footer {
     animation-delay: 0s;
     margin-top: 180px;
     user-select: none;
-
-    /*transform: rotateX(360deg);*/
-    /*-webkit-transform: rotateX(360deg); !* Safari 与 Chrome *!*/
-    /*transition-duration: 0.25s;*/
 }
 
 #inputWrapper {
@@ -298,7 +340,7 @@ footer {
     background: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
     width: 200px;
-    height: 35px;
+    height: 37px;
     outline: none;
     padding-inline-end: 44px;
     padding-inline-start: 52px;
