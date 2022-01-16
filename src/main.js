@@ -23,24 +23,24 @@ Vue.use(Vuex)
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
-      if (to.meta.requireAuth) {
-        if (store.state.user.username) {
-          next()
+        if (to.meta.requireAuth) {
+            if (store.state.user.username) {
+                next()
+            } else {
+                next({
+                    path: 'login',
+                    query: {redirect: to.fullPath}
+                })
+            }
         } else {
-          next({
-            path: 'login',
-            query: {redirect: to.fullPath}
-          })
+            next()
         }
-      } else {
-        next()
-      }
     }
 )
 
 new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+    el: '#app',
+    router,
+    store,
+    render: h => h(App)
 }).$mount('#app')
