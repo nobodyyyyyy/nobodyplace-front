@@ -13,7 +13,7 @@
                         <el-divider class="subTitle" content-position="left">搜索引擎</el-divider>
                         <el-radio-group class="selectList" v-model="searchEngineSelect" @change="searchEngineChange">
                             <el-radio-button label="search_engine_google">谷歌 &nbsp;&nbsp; https://www.google.com/search?q=</el-radio-button>
-                            <el-radio-button label="search_engine_baidu">百度 &nbsp;&nbsp; https://www.baidu.com/s?ie=utf-8&word=</el-radio-button>
+                            <el-radio-button label="search_engine_baidu">百度 &nbsp;&nbsp; https://www.baidu.com/s?word=</el-radio-button>
                             <el-radio-button label="search_engine_bing">必应 &nbsp;&nbsp; https://cn.bing.com/search?q=</el-radio-button>
                         </el-radio-group>
                         <el-divider class="subTitle" content-position="left">联想建议引擎</el-divider>
@@ -190,13 +190,29 @@ export default {
 }
 
 /deep/ .el-radio-button__inner {
+    user-select: none;
     border: none;
     width: 100%;
     text-align: left;
+    color: #414040;
+}
+
+/deep/ .el-radio-button__inner:hover {
+    color: #414040;
+    background-color: rgba(233, 255, 214, 0.45);
+    border-radius: 20px;
+    box-shadow: none;
 }
 
 /deep/ .el-radio-button:first-child .el-radio-button__inner {
     border: none;
+}
+
+/deep/ .el-radio-button__orig-radio:checked+.el-radio-button__inner {
+    background-color: rgb(233, 255, 214);
+    color: #414040;
+    border-radius: 20px;
+    box-shadow: none;
 }
 
 //

@@ -58,10 +58,6 @@ const KEYCODE_ARROW_UP = 38;
 const KEYCODE_ARROW_DOWN = 40;
 const WEB_URL_PREFIXES = ['https://', 'http://'];
 
-const SUGGESTION_ENGINE_BING = 'suggestion_engine_bing';
-const SUGGESTION_ENGINE_GOOGLE = 'suggestion_engine_google';
-const SUGGESTION_ENGINE_BAIDU = 'suggestion_engine_baidu';
-
 const SEARCH_ENGINE_BING = 'search_engine_bing';
 const SEARCH_ENGINE_GOOGLE = 'search_engine_google';
 const SEARCH_ENGINE_BAIDU = 'search_engine_baidu';
@@ -88,7 +84,6 @@ export default {
             seq: -1,
             suggestionCurSelectIdx: -1,
             onSuggestionBoxFocus: false,
-            webPrefix: 'https://www.google.com/search?q=',
 
             time: {
                 month: "",
@@ -120,9 +115,7 @@ export default {
             this.$axios
                 .get("/get_search_suggestions", {
                     params: {
-                        // engine: SUGGESTION_ENGINE_BING,
                         engine: that.$store.state.suggestionEngine,
-                        // engine: SUGGESTION_ENGINE_BAIDU,
                         seq: that.seq,
                         input: this.userInput
                     },
@@ -178,7 +171,8 @@ export default {
         openSuggestionSite(index) {
             this.onSuggestionBoxFocus = false;
             let suggestion = this.suggestions[index]
-            location.href = this.webPrefix + suggestion
+            let engine = this.$store.state.searchEngine;
+            location.href = this.getEnginePrefix(engine) + suggestion
             // window.open(this.webPrefix + suggestion,'_blank')  // 新窗口打开
         },
 
