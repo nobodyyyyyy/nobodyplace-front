@@ -1,16 +1,15 @@
 <template>
     <div>
         <!--    <img id="background" :class="{'onFocus': onFocus}" src="../../public/backgrounds/default_background_1.jpg" alt=""/>-->
-
+        <!--    防止组件拖动-->
+        <div class="cover" id="cover" style="" :class="{'onFocus': onFocus}"></div>
         <!--    TODO src 放后端 -->
-        <video id="background" autoplay loop muted :class="{'onFocus': onFocus}">
-            <source src="../../public/backgrounds/background_mountain.mp4" type="video/mp4"  />
+        <video id="background" :class="{'onFocus': onFocus}" autoplay loop muted>
+            <source src="../../public/backgrounds/background_mountain.mp4" type="video/mp4"/>
         </video>
 
         <entry-box></entry-box>
 
-        <!--    防止组件拖动-->
-        <div class="cover" id="cover" style=""></div>
         <div id="content">
             <h1 id="clock">
                 {{time.month}}月{{time.day}}日
@@ -217,7 +216,7 @@ export default {
         },
 
         getCurrentTime() {
-            let _this = this;
+            let that = this;
             let date = new Date()
             let month = date.getMonth() + 1;
             let day = date.getDate();
@@ -233,11 +232,11 @@ export default {
             if (seconds < 10) {
                 seconds = "0" + seconds;
             }
-            _this.time.month = month;
-            _this.time.day = day;
-            _this.time.hour = hours;
-            _this.time.minute = minutes;
-            _this.time.second = seconds;
+            that.time.month = month;
+            that.time.day = day;
+            that.time.hour = hours;
+            that.time.minute = minutes;
+            that.time.second = seconds;
         },
     }
 }
@@ -270,7 +269,6 @@ html,body {
 #background.onFocus {
     background-position: center;
     transform: scale(1.1);
-    filter: blur(3px);
     position: fixed;
     background-repeat: no-repeat;
 }
@@ -286,17 +284,25 @@ footer {
 }
 
 /*蒙层，禁止背景拖动*/
-#cover {
+.cover {
+    background-size: cover;
     z-index: -1;
-    opacity: 0;
     position: fixed;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    margin-bottom: 10px;
+    width: 110%;
+    height: 110%;
     transition: .25s;
     -webkit-transition: .25s;
     /*background-image: radial-gradient(rgba(220, 220, 220, 0.1), rgba(239, 182, 189, 0.3));*/
+}
+
+.cover.onFocus {
+    background-color: rgba(73, 72, 72, 0.07);
+    backdrop-filter: blur(5px);
+    position: fixed;
+    background-repeat: no-repeat;
 }
 
 #content {
