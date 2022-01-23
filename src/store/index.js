@@ -16,7 +16,7 @@ export default new Vuex.Store({
             'search_engine_google' : window.localStorage.getItem('searchEngine'),
         suggestionEngine: window.localStorage.getItem('suggestionEngine') == null ?
             'suggestion_engine_bing' : window.localStorage.getItem('suggestionEngine'),
-        countDownEvents: [],
+        countDownEvents: window.localStorage.getItem('countDownEvents') == null ? [] : JSON.parse(window.localStorage.getItem('countDownEvents'))
     },
     // 同步
     mutations: {
@@ -37,7 +37,9 @@ export default new Vuex.Store({
         // ------- countdowns begin -------
         initCountDownEvents(state, eventLists) {
             let countDowns = [];
-            console.log(eventLists)
+            if (eventLists == null || eventLists.length === 0) {
+                return;
+            }
             for (let i = 0; i < eventLists.length; ++i) {
                 try {
                     let event = eventLists[i];
@@ -63,6 +65,7 @@ export default new Vuex.Store({
             state.countDownEvents.sort((x, y) => {
                 return x['remainingTime'] - y['remainingTime'];
             });
+            window.localStorage.setItem('countDownEvents', JSON.stringify(state.countDownEvents))
         },
         updateCountDownEvent(state, newEvent) {
             const event = {
@@ -80,6 +83,7 @@ export default new Vuex.Store({
                 // 目前单位都是 d，先不考虑其他情况
                 return x['remainingTime'] - y['remainingTime'];
             });
+            window.localStorage.setItem('countDownEvents', JSON.stringify(state.countDownEvents))
             // Vue.set(state.countDownEvents, "name", obj)
         },
         deleteCountDownEvent(state, id) {
@@ -89,6 +93,7 @@ export default new Vuex.Store({
             for (let i = 0; i < state.countDownEvents.length; ++i) {
                 if (state.countDownEvents[i].id === id) {
                     state.countDownEvents.splice(i, 1);
+                    window.localStorage.setItem('countDownEvents', JSON.stringify(state.countDownEvents))
                     return;
                 }
             }

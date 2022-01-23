@@ -261,6 +261,7 @@ export default {
                             // });
                         // }
                     } else {
+                        this.$store.commit('initCountDownEvents', []);
                         this.$message({
                             message: '当前无法获取倒数日信息，请稍后再试',
                             type: 'warning'
