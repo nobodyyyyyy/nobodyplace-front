@@ -26,7 +26,7 @@
 
                     </el-collapse-item>
 
-                    <el-collapse-item title="占位" name="1">
+                    <el-collapse-item title="倒计时" name="countDownSetting">
 
                     </el-collapse-item>
                 </el-collapse>

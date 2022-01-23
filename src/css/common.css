@@ -1,21 +1,5 @@
-input::-webkit-search-cancel-button {
-  display: none;
+/* date picker 挂载与 app 同级，需要全局修改，
+   但是 popper-class 的指定不会让他全局响应 */
+.popperClass.el-popper {
+    border-radius: 30px;
 }
-
-input[type=search]::-ms-clear{
-  display: none;
-}
-/*
-input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-  color: #666
-}
-input:-moz-placeholder, textarea:-moz-placeholder {
-  color:#666
-}
-input::-moz-placeholder, textarea::-moz-placeholder {
-  color:#666;
-}
-input:-ms-input-placeholder, textarea:-ms-input-placeholder {
-  color:#666
-}
-*/
