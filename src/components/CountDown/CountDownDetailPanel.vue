@@ -144,6 +144,12 @@ export default {
                         type: 'warning'
                     });
                 }
+            }).catch(failResp => {
+                console.log(failResp)
+                this.$message({
+                    message: '目前暂无法删除倒数日，后端没启动',
+                    type: 'warning'
+                });
             })
             that.onEditingID = -1;
             that.onEditingEventName = '';
@@ -223,6 +229,12 @@ export default {
                         type: 'warning'
                     });
                 }
+            }).catch(failResp => {
+                console.log(failResp)
+                this.$message({
+                    message: '目前暂无法' + (action === ACTION_CREATE ? '创建' : '修改') + '倒数日，后端没启动',
+                    type: 'warning'
+                });
             })
             that.onEditingID = -1;
             that.onEditingEventName = '';

@@ -3,3 +3,12 @@
 .popperClass.el-popper {
     border-radius: 30px;
 }
+
+
+input::-webkit-search-cancel-button{
+  display: none;
+}
+
+input[type=search]::-ms-clear{
+  display: none;
+}

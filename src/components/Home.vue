@@ -261,7 +261,7 @@ export default {
                             // });
                         // }
                     } else {
-                        this.$store.commit('initCountDownEvents', []);
+                        this.$store.commit('initCountDownEvents', this.$store.getters.getCountDownEvents);
                         this.$message({
                             message: '当前无法获取倒数日信息，请稍后再试',
                             type: 'warning'
@@ -271,6 +271,11 @@ export default {
                 // eslint-disable-next-line no-unused-vars
                 .catch(failResp => {
                     console.log(failResp)
+                    this.$store.commit('initCountDownEvents', this.$store.getters.getCountDownEvents);
+                    this.$message({
+                        message: '后端没开',
+                        type: 'warning'
+                    });
                 })
         },
     }

@@ -37,9 +37,6 @@ export default new Vuex.Store({
         // ------- countdowns begin -------
         initCountDownEvents(state, eventLists) {
             let countDowns = [];
-            if (eventLists == null || eventLists.length === 0) {
-                return;
-            }
             for (let i = 0; i < eventLists.length; ++i) {
                 try {
                     let event = eventLists[i];
