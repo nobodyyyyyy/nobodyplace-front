@@ -35,14 +35,18 @@ export default new Vuex.Store({
 
         // todo import by module
         // ------- countdowns begin -------
-        initCountDownEvents(state, eventLists) {
+        initCountDownEvents(state, [eventLists, fromCache]) {
             let countDowns = [];
+            if (fromCache) {
+                eventLists = JSON.parse(window.localStorage.getItem('countDownEvents'));
+            } else {
+                window.localStorage.setItem('countDownEvents', JSON.stringify(eventLists))
+            }
             for (let i = 0; i < eventLists.length; ++i) {
                 try {
                     let event = eventLists[i];
-                    let originExpirationDate = eventLists[i]['expirationDate'];
-                    let expirationTime = originExpirationDate.split(' ')[0];
-                    let endTime = new Date(originExpirationDate.replace('/-/g', ':'));
+                    let expirationTime = eventLists[i]['expirationDate'].split(' ')[0];
+                    let endTime = new Date(eventLists[i]['expirationDate'].replace('/-/g', ':'));
                     let remainingTime = Math.ceil((endTime - (new Date()).getTime()) / (24 * 3600 * 1000));
                     countDowns.push({
                         id: event['id'],
@@ -62,7 +66,6 @@ export default new Vuex.Store({
             state.countDownEvents.sort((x, y) => {
                 return x['remainingTime'] - y['remainingTime'];
             });
-            window.localStorage.setItem('countDownEvents', JSON.stringify(state.countDownEvents))
         },
         updateCountDownEvent(state, newEvent) {
             const event = {

@@ -125,7 +125,7 @@ export default {
                     timeout: 1000,
                 })
                 .then(resp => {
-                    if (resp.data.code === 200 && resp.data.data.seq === that.seq) {
+                    if (resp.data.code === 0 && resp.data.data.seq === that.seq) {
                         that.suggestions = resp.data.data.suggestions;
                         that.suggestionCurSelectIdx = -1;
                         console.log('search suggestions are: ', that.suggestions)
@@ -248,9 +248,9 @@ export default {
             that.$axios
                 .get("/countdown/get_all")
                 .then(resp => {
-                    if (resp.data.code === 200) {
+                    if (resp.data.code === 0) {
                         let countDowns = resp.data.data['countDowns'];
-                        this.$store.commit('initCountDownEvents', countDowns);
+                        this.$store.commit('initCountDownEvents', [countDowns, false]);
                         // for (let i = 0; i < countDowns.length; ++i) {
                             // this.$store.commit('updateCountDownEvents', {
                             //     id: countDowns[i]['id'],
@@ -261,7 +261,7 @@ export default {
                             // });
                         // }
                     } else {
-                        this.$store.commit('initCountDownEvents', this.$store.getters.getCountDownEvents);
+                        this.$store.commit('initCountDownEvents', [[], true]);
                         this.$message({
                             message: '当前无法获取倒数日信息，请稍后再试',
                             type: 'warning'
@@ -271,7 +271,7 @@ export default {
                 // eslint-disable-next-line no-unused-vars
                 .catch(failResp => {
                     console.log(failResp)
-                    this.$store.commit('initCountDownEvents', this.$store.getters.getCountDownEvents);
+                    this.$store.commit('initCountDownEvents', [[], true]);
                     this.$message({
                         message: '后端没开',
                         type: 'warning'

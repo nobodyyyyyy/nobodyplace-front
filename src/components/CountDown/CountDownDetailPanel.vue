@@ -137,7 +137,7 @@ export default {
             // data.append('id', that.onEditingID);
             that.$axios.post('/countdown/delete', that.onEditingID).then(resp => {
                 // eslint-disable-next-line no-empty
-                if (resp.data.code === 200) {
+                if (resp.data.code === 0) {
                 } else {
                     this.$message({
                         message: '目前暂无法删除倒数日，请稍后再试',
@@ -222,7 +222,7 @@ export default {
                 expirationDate: that.onEditingExpirationTimeSelect
             }).then(resp => {
                 // eslint-disable-next-line no-empty
-                if (resp.data.code === 200) {
+                if (resp.data.code === 0) {
                 } else {
                     this.$message({
                         message: '目前暂无法' + (action === ACTION_CREATE ? '创建' : '修改') + '倒数日，请稍后再试',
