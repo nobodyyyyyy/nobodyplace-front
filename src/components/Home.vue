@@ -393,7 +393,7 @@ footer {
 
 .searchInput:hover {
     background: rgba(255, 255, 255, 0.6);
-    width: 500px;
+    width: 250px;
 }
 
 .searchInput:focus {
