@@ -1,16 +1,16 @@
 <template>
     <div>
         <!--    <img id="background" :class="{'onFocus': onFocus}" src="../../public/backgrounds/default_background_1.jpg" alt=""/>-->
-
+        <!--    防止组件拖动-->
+        <div class="cover" id="cover" style="" :class="{'onFocus': onFocus}"></div>
         <!--    TODO src 放后端 -->
-        <video id="background" autoplay loop muted :class="{'onFocus': onFocus}">
-            <source src="../../public/backgrounds/background_mountain.mp4" type="video/mp4"  />
+        <video id="background" :class="{'onFocus': onFocus}" autoplay loop muted>
+            <source src="../../public/backgrounds/background_mountain.mp4" type="video/mp4"/>
         </video>
 
-        <entry-box></entry-box>
+        <entry-box/>
+        <count-down-panel id="countDownPanel"/>
 
-        <!--    防止组件拖动-->
-        <div class="cover" id="cover" style=""></div>
         <div id="content">
             <h1 id="clock">
                 {{time.month}}月{{time.day}}日
@@ -18,9 +18,9 @@
             </h1>
 
             <div id="inputWrapper">
-                <input id="searchInput" type="search" autocomplete="off"
+                <input class="searchInput" :class="{onFocus : onFocus}" type="search" autocomplete="off"
                        spellcheck="false" role="combobox"
-                       aria-live="polite" placeholder="输入关键词查询，或者输入一个网址"
+                       aria-live="polite" :placeholder="onFocus ? '输入关键词，或者输入一个网站' : '搜索'"
                        v-model="userInput" @keyup.enter="submit"
                        v-on:focusin="onFocus = true"
                        v-on:focusout="onFocus = false"
@@ -52,7 +52,8 @@
 </template>
 
 <script>
-import EntryBox from "@/components/homeEntries/EntryBox";
+import EntryBox from "@/components/HomeEntries/EntryBox";
+import CountDownPanel from "@/components/CountDown/CountDownPanel";
 
 const KEYCODE_ARROW_UP = 38;
 const KEYCODE_ARROW_DOWN = 40;
@@ -65,10 +66,12 @@ const SEARCH_ENGINE_BAIDU = 'search_engine_baidu';
 export default {
     name: "Home",
     components: {
+        CountDownPanel,
         EntryBox,
     },
     created() {
-        this.getCurrentTime()
+        this.getCurrentTime();
+        this.loadCountDowns();
         setInterval(this.getCurrentTime, 1000);
     },
     mounted() {
@@ -122,7 +125,7 @@ export default {
                     timeout: 1000,
                 })
                 .then(resp => {
-                    if (resp.data.code === 200 && resp.data.data.seq === that.seq) {
+                    if (resp.data.code === 0 && resp.data.data.seq === that.seq) {
                         that.suggestions = resp.data.data.suggestions;
                         that.suggestionCurSelectIdx = -1;
                         console.log('search suggestions are: ', that.suggestions)
@@ -217,7 +220,7 @@ export default {
         },
 
         getCurrentTime() {
-            let _this = this;
+            let that = this;
             let date = new Date()
             let month = date.getMonth() + 1;
             let day = date.getDate();
@@ -233,11 +236,47 @@ export default {
             if (seconds < 10) {
                 seconds = "0" + seconds;
             }
-            _this.time.month = month;
-            _this.time.day = day;
-            _this.time.hour = hours;
-            _this.time.minute = minutes;
-            _this.time.second = seconds;
+            that.time.month = month;
+            that.time.day = day;
+            that.time.hour = hours;
+            that.time.minute = minutes;
+            that.time.second = seconds;
+        },
+        loadCountDowns() {
+            console.log('loading countdowns for the first time >>>')
+            let that = this;
+            that.$axios
+                .get("/countdown/get_all")
+                .then(resp => {
+                    if (resp.data.code === 0) {
+                        let countDowns = resp.data.data['countDowns'];
+                        this.$store.commit('initCountDownEvents', [countDowns, false]);
+                        // for (let i = 0; i < countDowns.length; ++i) {
+                            // this.$store.commit('updateCountDownEvents', {
+                            //     id: countDowns[i]['id'],
+                            //     name: countDowns[i]['eventName'],
+                            //     remainingTime: 20,
+                            //     expirationTime: countDowns[i]['expirationDate'],
+                            //     measurement: 'd'
+                            // });
+                        // }
+                    } else {
+                        this.$store.commit('initCountDownEvents', [[], true]);
+                        this.$message({
+                            message: '当前无法获取倒数日信息，请稍后再试',
+                            type: 'warning'
+                        });
+                    }
+                })
+                // eslint-disable-next-line no-unused-vars
+                .catch(failResp => {
+                    console.log(failResp)
+                    this.$store.commit('initCountDownEvents', [[], true]);
+                    this.$message({
+                        message: '后端没开',
+                        type: 'warning'
+                    });
+                })
         },
     }
 }
@@ -270,7 +309,6 @@ html,body {
 #background.onFocus {
     background-position: center;
     transform: scale(1.1);
-    filter: blur(3px);
     position: fixed;
     background-repeat: no-repeat;
 }
@@ -286,17 +324,25 @@ footer {
 }
 
 /*蒙层，禁止背景拖动*/
-#cover {
+.cover {
+    background-size: cover;
     z-index: -1;
-    opacity: 0;
     position: fixed;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    margin-bottom: 10px;
+    width: 110%;
+    height: 110%;
     transition: .25s;
     -webkit-transition: .25s;
     /*background-image: radial-gradient(rgba(220, 220, 220, 0.1), rgba(239, 182, 189, 0.3));*/
+}
+
+.cover.onFocus {
+    background-color: rgba(73, 72, 72, 0.07);
+    backdrop-filter: blur(5px);
+    position: fixed;
+    background-repeat: no-repeat;
 }
 
 #content {
@@ -327,7 +373,7 @@ footer {
     position: relative;
 }
 
-#searchInput {
+.searchInput {
     border: 1px solid transparent;
     border-radius: 25px;
     box-shadow: rgb(255, 192, 203) 0 0 3px;
@@ -344,14 +390,22 @@ footer {
     -webkit-transition: .25s;
 }
 
-#searchInput:hover {
+.searchInput:hover {
     background: rgba(255, 255, 255, 0.6);
+    width: 250px;
+}
+
+.searchInput:focus {
+    background: rgba(255, 255, 255, 0.9);
     width: 500px;
 }
 
-#searchInput:focus {
-    background: rgba(255, 255, 255, 0.9);
-    width: 500px;
+.searchInput::placeholder {
+    text-align: center;
+}
+
+.searchInput.onFocus::placeholder {
+    text-align: left;
 }
 
 #searchIcon {
@@ -400,6 +454,22 @@ footer {
     text-indent: 30px;
     border-radius: 20px;
     background: rgba(245, 241, 241, 0.7);
+}
+
+#countDownPanel {
+    /*left: 50%;*/
+    /*下面这个虽然呢让其居中，但是会导致子元素不能fixed布局*/
+    /*transform: translate(-50%, -50%);*/
+
+    /*能力原因，居右对齐了，呵呵*/
+    right: 10px;
+    bottom: 30px;
+
+    /*无效*/
+    /*alignment: center;*/
+    position: fixed;
+    z-index: 1;
+    cursor: pointer;
 }
 </style>
 

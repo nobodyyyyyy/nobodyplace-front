@@ -41,7 +41,7 @@ export default {
                     password: this.loginForm.password
                 })
                 .then(resp => {
-                    if (resp.data.code === 200) {
+                    if (resp.data.code === 0) {
                         _this.$store.commit('login', _this.loginForm)
                         const path = this.$route.query.redirect;
                         this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})

@@ -5,6 +5,8 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 
+import './css/common.css'
+
 // 设置反向代理，前端请求默认发送到 http://localhost:8443/api
 const axios = require('axios');
 axios.defaults.baseURL = 'http://localhost:8443/api'

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import SettingPanel from "@/components/homeEntries/SettingPanel";
+import SettingPanel from "@/components/HomeEntries/SettingPanel";
 export default {
     name: "EntryBox",
     components: {SettingPanel},
@@ -92,7 +92,7 @@ export default {
     align-items: end;
     justify-content: center;
 
-    height: 130px;
+    height: 100px;
     width: 100px;
     position: fixed;
     bottom: 80px;
@@ -102,7 +102,7 @@ export default {
 .entry {
     display: block;
     position: relative;
-    height: 150px;
+    height: 100px;
     width: 140px;
 }
 

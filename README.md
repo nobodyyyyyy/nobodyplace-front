@@ -10,19 +10,20 @@ So, nobodyplace is born.
 
 ## Features
 
-- Main Page is just like a normal search page, like classic Google with a big brand icon, and a simple input box for you to use search engine.
-- TODO
-- Count down
-- Offers a calendar showing the exact dates that I drank coffee, did exercise or other custom records, as well as offering a trend chart.
-- Since Typora is not free anymore, it's highly required to build an online blog with text format in markdown for myself. The online blog in nobodyplace can auto save your notes, upload images, create simple tables and even sorted by tag.
-- Support dark mode and other backgrounds
-- Settings
-- CSGO with real-time price check
+- [ ] 搜索 
+- [ ] 设置
+- [ ] 倒数日
+- [ ] 天气
+- [ ] 代办
+- [ ] CSGO 市场价格及收支统计
+- [ ] 背景选择
 
 ## History
 
-### 0.1 (2022/1/16)
+### 0.10 (2022/1/16)
+- 主页
+- 搜索引擎和搜索建议引擎支持、设置
 
-- Home page
-- Support google, baidu and bing search, as well as their suggestion engine.
-
+### 0.11 (2022/1/？)
+- 倒数日上线
+- UI 细节调整
