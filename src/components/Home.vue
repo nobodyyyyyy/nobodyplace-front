@@ -14,7 +14,8 @@
         <div id="content">
             <h1 id="clock">
                 {{time.month}}月{{time.day}}日
-                {{time.hour}}:{{time.minute}}:{{time.second}}
+                {{time.hour}}:{{time.minute}}
+<!--                :{{time.second}}-->
             </h1>
 
             <div id="inputWrapper">

@@ -1,8 +1,8 @@
 <template>
     <div>
 
-        <div id="settingCover" :class="{'onFocus': settingPanelOpened}"
-             style="opacity: 1;" v-on:click="settingPanelOpened = false"/>
+        <div id="settingCover" :class="{'onFocus': entryPanelOpened}"
+             style="opacity: 1;" v-on:click="entryPanelOpened = false"/>
 
 <!--        TODO setting、blog 合二为一，垃圾代码才写两份一样的-->
         <div id="entries">
@@ -21,41 +21,45 @@
             </div>
 
 
-            <div class="entry" id="blog">
+            <div class="entry" id="piggy_bank">
                 <transition name="fade">
-                    <span class="entryText" id="blogText" v-if="hoverOnBlog">
-                        博客
+                    <span class="entryText" id="blogText" v-if="hoverOnPiggy">
+                        投资
                     </span>
                 </transition>
-                <img class="entryIcon" src="../../../public/icons/blog_icon.svg" alt="blog"
-                     :class="{'blogHovering': hoverOnBlog}"
-                     v-on:mouseenter="hoverOnBlog = true"
-                     v-on:mouseleave="hoverOnBlog = false"
-                     v-on:click="1+1">
+                <img class="entryIcon" src="../../../public/icons/piggy_bank_icon.svg" alt="piggy_bank"
+                     :class="{'blogHovering': hoverOnPiggy}"
+                     v-on:mouseenter="hoverOnPiggy = true"
+                     v-on:mouseleave="hoverOnPiggy = false"
+                     v-on:click="piggyPanelOpened = true">
             </div>
         </div>
 
-        <setting-panel :settingPanelOpened="settingPanelOpened" @handleChange="onSettingPanelStatusChanged"/>
+        <setting-panel :settingPanelOpened="settingPanelOpened" @handleChange="onPanelClosed"/>
+        <piggy-panel :piggyPanelOpened="piggyPanelOpened" @handleChange="onPanelClosed"/>
 
     </div>
 </template>
 
 <script>
 import SettingPanel from "@/components/HomeEntries/SettingPanel";
+import PiggyPanel from "@/components/HomeEntries/PiggyPanel";
 export default {
     name: "EntryBox",
-    components: {SettingPanel},
+    components: {PiggyPanel, SettingPanel},
     data() {
         return {
             settingPanelOpened: false,
+            piggyPanelOpened: false,
             hoverOnSetting: false,
-            hoverOnBlog: false,
+            hoverOnPiggy: false,
         }
     },
     methods: {
-        onSettingPanelStatusChanged() {
+        onPanelClosed() {
             this.settingPanelOpened = false;
-        }
+            this.piggyPanelOpened = false;
+        },
     },
 }
 </script>
