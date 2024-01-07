@@ -303,6 +303,7 @@ export default {
 }
 
 /deep/ .el-dialog {
+  //height: 120px;
     width: 250px;
     max-height: 370px;
     position: absolute;
@@ -321,6 +322,10 @@ export default {
     z-index: 100;
 }
 
+/deep/ .el-dialog::-webkit-scrollbar {
+  width: 0 !important;
+}
+
 /deep/ .el-dialog__body {
     padding: 0;
 }
@@ -331,14 +336,19 @@ export default {
 }
 
 .countDownPanelContent {
+    //height: 40px;
     max-height: 360px;
-    width: 245px;
+    //width: 245px;
     margin-top: 4px;
     margin-bottom: 4px;
     margin-left: 2px;
     overflow-y: auto;
     background-color: rgba(255, 254, 254, 0.7);
     border-radius: 20px;
+}
+
+.countDownPanelContent::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 .item {

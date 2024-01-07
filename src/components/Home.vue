@@ -47,7 +47,7 @@
         </div>
 
         <footer>
-            © 2022 nobody ｜ All rights reserved
+            © 2024 nobody ｜ All rights reserved
         </footer>
     </div>
 </template>
