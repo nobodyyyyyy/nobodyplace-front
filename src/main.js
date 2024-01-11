@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 
 import './css/common.css'
+import * as echarts from 'echarts'
 
 // 设置反向代理，前端请求默认发送到 http://localhost:8080/api
 const axios = require('axios');
@@ -18,6 +19,7 @@ axios.interceptors.request.use(config => {
 // 全局注册
 // this.$axios
 Vue.prototype.$axios = axios
+Vue.prototype.$echarts = echarts
 
 // elementUI
 Vue.use(ElementUI)

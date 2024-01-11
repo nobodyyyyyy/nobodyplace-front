@@ -8,6 +8,10 @@
 <!--        <img class="title-img" :src="titleImg" alt=""/>-->
       </div>
       <el-button v-on:click="click"/>
+      <el-button v-on:click="click"/>
+      <el-button v-on:click="click"/>
+      <el-button v-on:click="click"/>
+      <el-button v-on:click="click"/>
     </div>
   </div>
 </template>
@@ -24,10 +28,35 @@ export default {
   },
   methods: {
     click() {
-      this.$message({
-        message: '登录成果，欢迎光临，' + localStorage.getItem("name"),
-        type: 'success'
-      });
+      this.callAsync()
+
+    },
+
+    callAsync() {
+      const _this = this;
+      _this.$axios
+        .get('/asyncFuture', {
+
+        }).then(resp => {
+        if (resp.data.code === 0) {
+          this.$message({
+            message: '登录成果，欢迎光临，' + localStorage.getItem("name"),
+            type: 'success'
+          });
+        } else {
+          console.log(resp.data)
+          this.$message({
+            message: resp.data.msg,
+            type: 'warning'
+          });
+        }
+      })
+        .catch(failResponse => {
+          this.$message({
+            message: failResponse,
+            type: 'warning'
+          });
+        })
     }
   }
 }

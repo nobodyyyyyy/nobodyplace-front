@@ -47,7 +47,7 @@
           </div>
 
         </div>
-        <div class="display-box">
+        <div class="display-box" v-loading="loading">
 
           <template>
             <el-table class="result-table" :data="tableData" max-height="700" style="width: 100%">
@@ -56,8 +56,7 @@
                 <template scope="scope">
                     <div class="demo-image__preview">
                       <el-image style="width: 100px; height: 100px; margin-left:10px;"
-                             :src=" scope.row.picUrl"
-                             :preview-src-list="scope.row.picUrl">
+                             :src=" scope.row.picUrl">
                       </el-image>
                   </div>
                 </template>
@@ -85,7 +84,7 @@
                     入库
                   </el-button>
                   <el-button
-                    @click.native.prevent="dialogFormVisible=true" type="text" size="median">
+                    @click.native.prevent="requestHistoryPrice(scope.$index, tableData)" type="text" size="median">
                     查看历史价格
                   </el-button>
                 </template>
@@ -121,6 +120,10 @@
                 <el-button @click="dialogFormVisible=false">取 消</el-button>
                 <el-button type="primary" @click="handleAddToInventory">确 定</el-button>
               </div>
+            </el-dialog>
+
+            <el-dialog :visible.sync="chartVisible" width="65%">
+              <div id="priceLineChart" style='width: 90%; height: 500px; overflow: auto; left: 50px; text-align: center;'></div>
             </el-dialog>
 
           </template>
@@ -178,6 +181,8 @@ export default {
         date: '',
         cost: 1000,
       },
+      loading: false,
+      chartVisible: false,
     }
   },
   mounted () {
@@ -214,15 +219,17 @@ export default {
           _this.tableData = data.records
           _this.totalEntries = data.total
         } else {
-          this.$message({
-            message: resp.data.data.msg,
+          this.$notify({
+            title: '失败',
+            message: resp.data.msg,
             type: 'warning'
           });
         }
 
       })
         .catch(failResponse => {
-          this.$message({
+          this.$notify({
+            title: '失败',
             message: failResponse,
             type: 'warning'
           });
@@ -255,19 +262,137 @@ export default {
           });
         } else {
           this.$message({
-            message: resp.data.data.msg,
+            message: resp.data.msg,
             type: 'warning'
           });
         }
 
       })
         .catch(failResponse => {
-          this.$message({
+          this.$notify({
+            title: '失败',
             message: failResponse,
             type: 'warning'
           });
         })
-    }
+    },
+
+    requestHistoryPrice(idx, rows) {
+      const itemId = rows[idx].itemId
+      const itemName = rows[idx].nameCn
+      this.handleRequestHistoryPrice(itemId, itemName)
+    },
+
+    handleRequestHistoryPrice(itemId, itemName) {
+      let _this = this
+
+      _this.loading = true
+      _this.$axios
+        .post('/csgo/get_item_price', {
+          itemId: itemId
+        }).then(resp => {
+        if (resp.data.code === 0) {
+          console.log(resp.data)
+          this.$notify({
+            title: '成功',
+            message: itemName + ' 价格查询完毕',
+            type: 'success'
+          });
+          _this.chartVisible = true
+          _this.loading = false
+          this.$nextTick(() => {
+            this.drawHistoryPriceChart(resp.data.data, itemName)
+          })
+        } else {
+          this.$notify({
+            title: '失败',
+            message: resp.data.msg,
+            type: 'warning'
+          });
+          _this.loading = false
+        }
+
+      })
+        .catch(failResponse => {
+          this.$notify({
+            title: '失败',
+            message: failResponse,
+            type: 'warning'
+          });
+          _this.loading = false
+        })
+    },
+
+    drawHistoryPriceChart (data, itemName) {
+      let prices = []
+      let dates = []
+      let titleText = itemName + ' 历史价格记录'
+      for (let i = 0; i < data.length; ++i) {
+        prices.push(data[i].price)
+        dates.push(data[i].time)
+      }
+      prices.reverse()
+      dates.reverse()
+      let chart = this.$echarts.init(document.getElementById('priceLineChart'))
+      chart.setOption({
+        title: {
+          text: titleText,
+          left: 'center',
+          top: '5%'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        // legend: {
+        //   top: '8%',
+        //   bottom: '5%',
+        //   data: types
+        // },
+        grid: {
+          height: '60%',
+          left: '3%',
+          right: '4%',
+          top: '17%',
+          containLabel: true
+        },
+        toolbox: {
+          show: true,
+          left: '4%',
+          top: '2%',
+          feature: {
+            saveAsImage: {
+              show: true,
+              excludeComponents: ['toolbox'],
+              pixelRatio: 2
+            },
+            dataZoom: {
+              show: true
+            }
+          }
+        },
+        xAxis: {
+          type: 'category',
+          data: dates
+        },
+        yAxis: {
+          type: 'value',
+          name: '￥',
+          min: function(value) {//取最小值向下取整为最小刻度
+            return Math.floor(value.min)
+          },
+          max: function(value) {//取最大值向上取整为最大刻度
+            return Math.ceil(value.max)
+          },
+          scale: true,
+        },
+        series: [
+          {
+            data: prices,
+            type: 'line'
+          }
+        ]
+      })
+    },
 
   },
 

@@ -49,21 +49,28 @@ export default {
             localStorage.setItem("name", data.name);
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", data.userName);
-            this.$message({
+            this.$notify({
+              title: '成功',
               message: '登录成功，欢迎光临，' + localStorage.getItem("name"),
               type: 'success'
             });
             const path = this.$route.query.redirect;
             this.$router.replace({path: path === '/' || path === undefined ? '/Main' : path})
           } else {
-            this.$message({
-              message: '密码输错',
+            this.$notify({
+              title: '密码错误',
+              message: '请重新输入密码',
               type: 'warning'
             });
           }
         })
         // eslint-disable-next-line no-unused-vars
         .catch(failResponse => {
+          this.$notify({
+            title: '错误',
+            message: failResponse,
+            type: 'warning'
+          });
         })
     }
   }
