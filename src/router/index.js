@@ -7,6 +7,7 @@ import Main from "@/components/Main.vue";
 import root from "@/components/root.vue";
 import CSGOItems from "@/components/csgo/CSGOItems.vue";
 import CSGOInventory from "@/components/csgo/CSGOInventory.vue";
+import CSGORank from "@/components/csgo/CSGORank.vue";
 
 Vue.use(VueRouter)
 
@@ -58,6 +59,11 @@ const routes = [
         path: '/csgo-inventory',
         name: 'csgo-inventory',
         component: CSGOInventory
+      },
+      {
+        path: '/csgo-rank',
+        name: 'csgo-rank',
+        component: CSGORank
       },
     ]
   }

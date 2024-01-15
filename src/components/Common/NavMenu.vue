@@ -20,6 +20,7 @@
       </template>
       <el-menu-item index="csgo-items">物品查询</el-menu-item>
       <el-menu-item index="csgo-inventory">个人仓库</el-menu-item>
+      <el-menu-item index="csgo-rank">排行榜</el-menu-item>
     </el-submenu>
     <el-menu-item index="/setting" :key="2">
       <i class="el-icon-setting"></i>

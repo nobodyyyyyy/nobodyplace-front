@@ -8,10 +8,7 @@
 <!--        <img class="title-img" :src="titleImg" alt=""/>-->
       </div>
       <el-button v-on:click="click"/>
-      <el-button v-on:click="click"/>
-      <el-button v-on:click="click"/>
-      <el-button v-on:click="click"/>
-      <el-button v-on:click="click"/>
+      <el-button v-on:click="testsend"/>
     </div>
   </div>
 </template>
@@ -22,14 +19,38 @@ export default {
   components: {},
   data () {
     return {
+      socket: null
       // backgroundImg: require('../assets/login.jpg'),
       // titleImg: require('../assets/title.png')
     }
   },
+  mounted() {
+    this.init()
+  },
   methods: {
     click() {
-      this.callAsync()
+      // this.callAsync()
+      this.init();
+    },
 
+    testsend() {
+      const _this = this;
+      _this.$axios
+        .get('/send', {
+
+        }).then(resp => {
+        if (resp.status === 200) {
+          console.log('ok')
+        } else {
+          console.log('err')
+        }
+      })
+        .catch(failResponse => {
+          // this.$message({
+          //   message: failResponse,
+          //   type: 'warning'
+          // });
+        })
     },
 
     callAsync() {
@@ -40,7 +61,7 @@ export default {
         }).then(resp => {
         if (resp.data.code === 0) {
           this.$message({
-            message: '登录成果，欢迎光临，' + localStorage.getItem("name"),
+            message: '登录成功，欢迎光临，' + localStorage.getItem("name"),
             type: 'success'
           });
         } else {
@@ -57,6 +78,46 @@ export default {
             type: 'warning'
           });
         })
+    },
+
+    // 初始化方法
+    init() {
+
+      //1、websocket接口的url
+      let ws = "ws://localhost:8080/notice/" + localStorage.getItem("id");
+
+      // 实例化socket
+      this.socket = new WebSocket(ws);
+      // 监听socket连接
+      this.socket.onopen = this.socketOpen;
+      // 监听socket错误信息
+      this.socket.onerror = this.error;
+      // 监听socket消息
+      this.socket.onmessage = this.getMessage;
+      // 监听socket断开连接的消息
+      this.socket.close = this.close;
+    },
+
+// 连接成功方法
+    socketOpen() {
+      console.log("socket连接成功");
+    },
+// 连接错误
+    error() {
+      console.log("连接错误");
+    },
+// 接受信息接口
+    getMessage(message) {
+      console.log("收到消息");
+      this.$notify({
+        title: "消息通知",
+        type: "success",
+        message: message.data,
+      });
+    },
+// 关闭处理
+    close() {
+      console.log("连接关闭");
     }
   }
 }
